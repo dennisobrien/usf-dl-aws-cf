@@ -6,14 +6,66 @@ Based on shell scripts provided by Jeremy Howard in the Deep Learning I course a
 
 ## Requirements
 
-- ansible
-- troposphere
-- AWS account
+In order to run the deploy playbook you will need these installed.
+
+- python2 - Ansible 2.1.x does not yet fully support Python3.  I recommend using a conda environment with Python 2 as the interpreter.
+- ansible - Used for setting up the AWS stack and provisioning the EC2 machine.
+- troposphere - Nice pythonic alternative to writing CloudFormation templates.
+- boto - Used by ansible for AWS services.
+
+In addition to the software setup there are a few additional prerequisites:
+
+- AWS account - This is spinning up AWS services that might cost you money.
+- AWS private key - I'm assuming you have already configured keys in AWS and have access to the private key locally.
+
+## Pre-flight Check
+
+- `vars.yml` - Create a `vars.yml` file by copying vars.template.yml and customizing the values.
+    - This is ignored by git and will not be committed.
+- `passwords.yml` - Create a `passwords.yml` using `ansible-vault`.
+    - `$ ansible-vault create passwords.yml`
+    - Add the following values:
+```YAML
+---
+  jupyter_notebook_password: "your_notebook_password_here"
+  github_username: your_github_username
+  github_access_key: your_github_access_key
+```
+    - This is ignored by git and will not be committed.
+- Download `cudnn-8.0-linux-x64-v5.1.tgz` from the nVidia developer program. Copy it to `files/`.
+
+## Deploying
+
+`$ ANSIBLE_HOST_KEY_CHECKING=0 ansible-playbook -vv --private-key ~/.ssh/YOUR_AWS_KEY deploy.yml --ask-vault-pass`
+
+- The environment variable `ANSIBLE_HOST_KEY_CHECKING` is required since the ec2 instance is created the first time
+this playbook is run so it will not be in your known_hosts.
+
+This does the following:
+
+- Provisions an EC2 machine based on the instance type specified in `vars.yml`.
+- Installs system software on the EC2 instance.
+- Installs Anaconda.
+- Generates SSL certs and copies configuration files to secure Jupyter notebook server.
+- Installs nVidia CUDA.
+- Installs nVidia cuDNN.
+- Creates a conda environment "py3" and installs packages.
+- Writes `.theanorc` to configure Theano for GPU.
+- (Re-)starts Jupyter notebook service via systemd.
+
+## TODO
+
+- Separate the playbook into multiple roles.
+- Use the cloudformation template that creates an elastic ip (and VPC, subnet, etc.).
+- Deploying will restart `jupyter notebook` if there is a change to the `jupyter-notebook.service` definition.  In this
+case, if there are any currently running kernels, they will be restarted.  It would be nice to at least warn if this
+were the case.
 
 ## Resources
 
 These are projects and posts I found helpful while putting this together.
 
+- Jeremy Howard's scripts and setup of EC2 machines for Deep Learning.
 - troposphere
     - [cloudtools/troposphere](https://github.com/cloudtools/troposphere)
     - [remind101/stacker](https://github.com/remind101/stacker)
