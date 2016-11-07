@@ -281,6 +281,7 @@
       executable: /bin/bash
     environment: "{{ env }}"
 
+  # TODO: find a faster way to do this, like a batch
   - name: Install conda packages
     shell: conda install --name py3 --channel conda-forge -y {{item}}
     args:
@@ -305,6 +306,15 @@
       - scipy=0.18.1
       - cryptography=1.5.2
       - sh=1.11
+      - sympy=1.0
+
+  - name: Install pip packages (not available via conda)
+    pip:
+      name: "{{ item }}"
+      executable: "{{ anaconda_home_dir }}/envs/py3/bin/pip"
+    environment: "{{ env }}"
+    with_items:
+      - kaggle-cli
 
   - name: Copy .theanorc
     template:
