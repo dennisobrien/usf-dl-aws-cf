@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart={{ anaconda_home_dir }}/bin/jupyter notebook --port={{ jupyter_notebook_port }} --no-browser
+ExecStart={{ anaconda_home_dir }}/envs/py3/bin/jupyter notebook --port={{ jupyter_notebook_port }} --no-browser
 User=ubuntu
 Group=ubuntu
 WorkingDirectory={{ jupyter_notebook_working_dir }}
