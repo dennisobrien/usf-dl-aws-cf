@@ -308,10 +308,20 @@
       - sh=1.11
       - sympy=1.0
 
-  - name: Install pip packages (not available via conda)
+  - name: Install pip packages into py3 env (not available via conda)
     pip:
       name: "{{ item }}"
       executable: "{{ anaconda_home_dir }}/envs/py3/bin/pip"
+    environment: "{{ env }}"
+    with_items:
+      - kaggle-cli
+
+  # FIXME: jupyter notebook is launched in the default env, but notebooks in py3 env use default conda env bin/
+  # Is this a conda bug?  Or Jupyter? Or (more likely) something I've misconfigured?
+  - name: Install pip packages into default env (not available via conda)
+    pip:
+      name: "{{ item }}"
+      executable: "{{ anaconda_home_dir }}/bin/pip"
     environment: "{{ env }}"
     with_items:
       - kaggle-cli
