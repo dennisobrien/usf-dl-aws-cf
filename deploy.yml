@@ -56,6 +56,7 @@
     anaconda_installer_sh : "{{anaconda_name}}.sh"
     anaconda_installer_url : "{{anaconda_mirror}}/{{anaconda_installer_sh}}"
     anaconda_home_dir: "{{ home_dir }}/anaconda{{ anaconda_python_ver }}"
+    cuda_home: "/usr/local/cuda-8.0/"
     cudnn_filename: "cudnn-8.0-linux-x64-v5.1.tgz"
     jupyter_notebook_certfile: "{{ home_dir }}/etc/sslcert.pem"
     jupyter_notebook_keyfile: "{{ home_dir }}/etc/sslkey.key"
@@ -202,7 +203,7 @@
     register: cuda_result
     ignore_errors: True
 
-  # validate checksum: 16b0946a3c99ca692c817fb7df57520c
+  # TODO: validate checksum: 16b0946a3c99ca692c817fb7df57520c
   - name: Install nVidia CUDA drivers for Ubuntu 16.04
     apt:
       deb: http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.44-1_amd64.deb
@@ -222,8 +223,8 @@
       state: present
       line: "{{ item }}"
     with_items:
-      - export PATH=/usr/local/cuda-8.0/bin:${PATH}
-      - export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:${LD_LIBRARY_PATH}
+      - "export PATH={{ cuda_home }}/bin:${PATH}"
+      - "export LD_LIBRARY_PATH={{ cuda_home }}/lib64:${LD_LIBRARY_PATH}"
     when: nvidia_result|succeeded and cuda_result|failed
 
   - name: Configure nvidia
@@ -240,7 +241,7 @@
       state: directory
 
   - name: Test for CUDNN install
-    shell: ls /usr/local/cuda/include/cudnn.h
+    shell: "ls {{ cuda_home }}/include/cudnn.h"
     register: cudnn_result
     ignore_errors: True
 
@@ -253,9 +254,9 @@
   - name: Copy CUDNN header and lib files
     command: "{{ item }}"
     with_items:
-      - "cp -P {{ home_dir }}/opt/cuda/include/cudnn.h /usr/local/cuda/include/"
-      - "cp -P {{ home_dir }}/opt/cuda/lib64/libcudnn* /usr/local/cuda/lib64/"
-      - "chmod a+r /usr/local/cuda/lib64/libcudnn*"
+      - "cp -P {{ home_dir }}/opt/cuda/include/cudnn.h {{ cuda_home }}/include/"
+      - "cp -P {{ home_dir }}/opt/cuda/lib64/libcudnn* {{ cuda_home }}/lib64/"
+      - "chmod a+r {{ cuda_home }}/lib64/libcudnn*"
     become: true
     when: nvidia_result|succeeded and cudnn_result|failed
 

@@ -2,5 +2,8 @@
 device = gpu
 floatX = float32
 
+[lib]
+cnmem=1.0
+
 [cuda]
-root = /usr/local/cuda-8.0/
+root = {{ cuda_home }}
