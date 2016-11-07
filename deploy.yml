@@ -85,6 +85,8 @@
       - binutils
       - tmux
       - unzip
+      - htop
+      - tree
 
   #
   # Anaconda
@@ -301,6 +303,7 @@
       - requests=2.11.1
       - scipy=0.18.1
       - cryptography=1.5.2
+      - sh=1.11
 
   - name: Copy .theanorc
     template:
