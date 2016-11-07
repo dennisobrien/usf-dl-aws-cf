@@ -1,0 +1,21 @@
+---
+  stack_name: USFDeepLearningStack
+  aws_region: us-west-2
+  key_name: aws-key
+  instance_type: t2.micro
+  ssh_location: 0.0.0.0/0
+
+  openssl_country: US
+  openssl_state: TX
+  openssl_locality: Austin
+  openssl_org: MyOrg
+  openssl_org_unit: Research
+  openssl_org_name: MyOrgName
+  openssl_subject_arg: "/C={{ openssl_country}}/ST={{ openssl_state }}/L={{ openssl_locality }}/O={{ openssl_org }}/OU={{ openssl_org_unit }}/CN={{ openssl_org_name }}"
+
+  jupyter_notebook_port: 8888
+  # define these credentials in passwords.yml
+  jupyter_notebooks_repo_url: "https://{{ github_username }}:{{ github_access_key }}@github.com/YOUR_GITHUB/YOUR_PROJECT.git"
+  jupyter_notebooks_repo_remote: origin
+  jupyter_notebooks_repo_version: master
+

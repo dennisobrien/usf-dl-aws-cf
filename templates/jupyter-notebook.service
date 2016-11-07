@@ -1,0 +1,14 @@
+[Unit]
+Description=Jupyter Notebook
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart={{ anaconda_home_dir }}/bin/jupyter notebook --port={{ jupyter_notebook_port }} --no-browser
+User=ubuntu
+Group=ubuntu
+WorkingDirectory={{ jupyter_notebook_working_dir }}
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

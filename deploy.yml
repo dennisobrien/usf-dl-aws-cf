@@ -1,0 +1,329 @@
+---
+# Configure and update the cloudformation stack and provision the EC2.
+
+- name: provision stack
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_files:
+    - vars.yml
+    - passwords.yml
+
+  vars:
+    cloudformation_template: tmp_cloudformation.json
+
+  tasks:
+  - name: generate cloudformation template from troposphere file
+    shell: python aws/cloudformation_ec2_default_vpc.py > {{ cloudformation_template }}
+
+  - name: deploy cloudformation
+    cloudformation:
+      stack_name: "{{ stack_name }}"
+      state: present
+      region: "{{ aws_region }}"
+      template: "{{ cloudformation_template }}"
+    args:
+      template_parameters:
+        KeyName: "{{ key_name }}"
+        InstanceType: "{{ instance_type }}"
+        SSHLocation: "{{ ssh_location }}"
+    register: stack
+
+  - name: show stack outputs
+    debug: msg="My stack outputs are {{ stack.stack_outputs }}"
+
+  - name: change the host based on the stack output
+    add_host:
+      hostname: "{{ stack.stack_outputs.PublicIP }}"
+      groups: ec2_host
+
+- name: configure ec2
+  hosts: ec2_host
+  remote_user: ubuntu
+  become_method: sudo
+  gather_facts: False
+
+  vars:
+    home_dir: "/home/ubuntu/"
+    download_dir: "{{ home_dir }}/download"
+    anaconda_mirror : "http://repo.continuum.io/archive"
+    anaconda_python_ver : "3"
+    anaconda_ver : "4.2.0"
+    anaconda_timeout_seconds : 600
+    anaconda_platform : "{{ansible_system}}-{{ansible_machine}}"
+    anaconda_name : "Anaconda{{anaconda_python_ver}}-{{anaconda_ver}}-{{anaconda_platform}}"
+    anaconda_installer_sh : "{{anaconda_name}}.sh"
+    anaconda_installer_url : "{{anaconda_mirror}}/{{anaconda_installer_sh}}"
+    anaconda_home_dir: "{{ home_dir }}/anaconda{{ anaconda_python_ver }}"
+    cudnn_filename: "cudnn-8.0-linux-x64-v5.1.tgz"
+    jupyter_notebook_certfile: "{{ home_dir }}/etc/sslcert.pem"
+    jupyter_notebook_keyfile: "{{ home_dir }}/etc/sslkey.key"
+    jupyter_notebook_working_dir: "{{ home_dir }}/notebooks_repo"
+    env:
+      PATH: "{{ anaconda_home_dir }}/bin:$PATH"
+
+  vars_files:
+    - vars.yml
+    - passwords.yml
+
+  pre_tasks:
+  - name: Install python 2
+    raw: test -e /usr/bin/python || (apt -y update && apt-get install -y python2.7 python-simplejson)
+    become: true
+
+  - name: Gather facts
+    setup: # aka gather_facts
+
+  tasks:
+  - name: Install packages with apt
+    apt: pkg={{ item }} state=present force=yes update_cache=yes
+    become: true
+    with_items:
+      - build-essential
+      - software-properties-common
+      - binutils
+      - tmux
+      - unzip
+
+  #
+  # Anaconda
+  #
+  - name: Detect conda version
+    shell: conda --version
+      executable=/bin/bash
+    environment: "{{ env }}"
+    register: conda_result
+    ignore_errors: True
+
+  - name: Debug conda version
+    debug:
+      var: conda_result
+
+  - name: Create download directory
+    file:
+      path: "{{ download_dir }}"
+      state: directory
+      mode: 0755
+
+  - name: Download Anaconda installer
+    get_url:
+      url: "{{ anaconda_installer_url }}"
+      dest: "{{ download_dir }}/{{ anaconda_installer_sh }}"
+      mode: 0755
+      timeout: "{{ anaconda_timeout_seconds }}"
+    when: conda_result|failed
+
+  - name: Installing Anaconda
+    command: bash {{ download_dir }}/{{ anaconda_installer_sh }} -b
+    args:
+      creates: "{{ anaconda_home_dir }}/bin/conda"
+    when: conda_result|failed
+
+  - name: Delete Anaconda installer
+    file:
+      path: "{{ download_dir }}/{{ anaconda_installer_sh }}"
+      state: absent
+
+  - name: Add Anaconda to .bashrc
+    lineinfile:
+      dest: "{{ home_dir }}/.bashrc"
+      state: present
+      line: export PATH="{{ anaconda_home_dir }}/bin:$PATH"
+#
+#  - name: Fixup PATH
+#    command: "{{ item }}"
+#    with_items:
+#      - echo 'export PATH="{{ anaconda_home_dir }}/bin:$PATH"' >> ~/.bashrc
+#      - export PATH="{{ anaconda_home_dir }}/bin:$PATH"
+
+  #
+  # Jupyter notebook
+  #
+#  - name: Generate Jupyter Notebook config - REMOVED
+#    shell: jupyter notebook --generate-config
+#      executable=/bin/bash
+#    environment: "{{ env }}"
+
+  - name: Ensures ~/etc dir exists
+    file:
+      path: ~/etc
+      state: directory
+
+  - name: Create cert for https
+    shell: "openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout {{ jupyter_notebook_keyfile }} -out {{ jupyter_notebook_certfile }} -subj {{ openssl_subject_arg }}"
+    args:
+      executable: /bin/bash
+      creates: "{{ jupyter_notebook_keyfile }}"
+    environment: "{{ env }}"
+
+  - name: Get hash for jupyter notebook auth
+    shell: python -c "from notebook.auth import passwd; print(passwd({{ jupyter_notebook_password | quote }}))"
+    args:
+      executable: /bin/bash
+    environment: "{{ env }}"
+    register: notebook_auth
+
+  - name: Ensures .jupyter dir exists
+    file:
+      path: .jupyter
+      state: directory
+
+  - name: Copy jupyter_notebook_config.py
+    template:
+      src: templates/jupyter_notebook_config.py
+      dest: .jupyter/jupyter_notebook_config.py
+
+  - name: Check if the notebooks repo is already cloned
+    stat:
+      path: "{{ jupyter_notebook_working_dir }}"
+    register: repo_dir
+
+  - name: git clone notebooks repo
+    git:
+      repo: "{{ jupyter_notebooks_repo_url}}"
+      dest: "{{ jupyter_notebook_working_dir }}"
+      remote: "{{ jupyter_notebooks_repo_remote }}"
+      version: "{{ jupyter_notebooks_repo_version }}"
+    when: not repo_dir.stat.exists
+
+  #
+  # nVidia CUDA
+  #
+  - name: Test for nVidia hardware
+    shell: lspci | grep -i nvidia
+    register: nvidia_result
+    ignore_errors: True
+
+  - name: Test for Cuda install
+    shell: dpkg-query -l cuda
+    register: cuda_result
+    ignore_errors: True
+
+  # validate checksum: 16b0946a3c99ca692c817fb7df57520c
+  - name: Install nVidia CUDA drivers for Ubuntu 16.04
+    apt:
+      deb: http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.44-1_amd64.deb
+    become: true
+    when: nvidia_result|succeeded and cuda_result|failed
+
+  - name: Install cuda package
+    apt:
+      name: cuda
+      update_cache: yes
+    become: true
+    when: nvidia_result|succeeded and cuda_result|failed
+
+  - name: Cuda post-install steps
+    lineinfile:
+      dest: "{{ home_dir }}/.bashrc"
+      state: present
+      line: "{{ item }}"
+    with_items:
+      - export PATH=/usr/local/cuda-8.0/bin:${PATH}
+      - export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:${LD_LIBRARY_PATH}
+    when: nvidia_result|succeeded and cuda_result|failed
+
+  - name: Configure nvidia
+    command: "{{ item }}"
+    with_items:
+      - modprobe nvidia
+      - nvidia-smi
+    become: true
+    when: nvidia_result|succeeded
+
+  - name: Ensures ~/opt dir exists
+    file:
+      path: opt
+      state: directory
+
+  - name: Test for CUDNN install
+    shell: ls /usr/local/cuda/include/cudnn.h
+    register: cudnn_result
+    ignore_errors: True
+
+  - name: Install CUDNN
+    unarchive:
+      src: "files/{{ cudnn_filename }}"
+      dest: "{{ home_dir }}/opt"
+    when: nvidia_result|succeeded and cudnn_result|failed
+
+  - name: Copy CUDNN header and lib files
+    command: "{{ item }}"
+    with_items:
+      - "cp -P {{ home_dir }}/opt/cuda/include/cudnn.h /usr/local/cuda/include/"
+      - "cp -P {{ home_dir }}/opt/cuda/lib64/libcudnn* /usr/local/cuda/lib64/"
+      - "chmod a+r /usr/local/cuda/lib64/libcudnn*"
+    become: true
+    when: nvidia_result|succeeded and cudnn_result|failed
+
+  #
+  # Install conda packages in environments
+  #
+  - name: Add conda-forge
+    shell: conda config --add channels conda-forge
+      executable=/bin/bash
+    environment: "{{ env }}"
+
+  - name: Create conda environment
+    shell: conda create --name py3 python=3 jupyter notebook ipykernel
+    args:
+      executable: /bin/bash
+      creates: "{{ anaconda_home_dir }}/envs/py3"
+    environment: "{{ env }}"
+
+  - name: Add kernel to list in Jupyter Notebook
+    shell: "{{ anaconda_home_dir }}/envs/py3/bin/python -m ipykernel install --user"
+    args:
+      executable: /bin/bash
+    environment: "{{ env }}"
+
+  - name: Install conda packages
+    shell: conda install --name py3 --channel conda-forge -y {{item}}
+    args:
+      executable: /bin/bash
+    environment: "{{ env }}"
+    with_items:
+      - numpy==1.11.2
+      - theano==0.8.2
+      - keras==1.0.7
+      - pandas==0.19.1
+      - matplotlib=1.5.3
+      - seaborn=0.7.1
+      - bokeh==0.12.3
+      - bcolz==1.0.0
+      - scikit-learn=0.18
+      - scikit-image=0.12.3
+      - statsmodels=0.6.1
+      - boto3==1.4.0
+      - ipython==5.1.0
+      - networkx=1.11
+      - requests=2.11.1
+      - scipy=0.18.1
+      - cryptography=1.5.2
+
+  - name: Copy .theanorc
+    template:
+      src: templates/theanorc
+      dest: "{{ home_dir }}/.theanorc"
+
+  #
+  # Start Jupyter Notebook
+  #
+  - name: Copy jupyter-notebook systemd script
+    template:
+      src: templates/jupyter-notebook.service
+      dest: /etc/systemd/system/jupyter-notebook.service
+    become: true
+    notify:
+      - restart jupyter
+
+  handlers:
+    - name: restart jupyter
+#      debug: msg="restarting jupyter notebook"
+      systemd:
+        name: jupyter-notebook
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      become: true

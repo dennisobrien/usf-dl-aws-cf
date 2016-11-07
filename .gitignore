@@ -1,0 +1,6 @@
+.idea/
+/tmp_*.json
+/vars.yml
+/*.retry
+/passwords.yml
+/files/*.tgz
