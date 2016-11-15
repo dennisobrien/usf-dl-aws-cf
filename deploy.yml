@@ -88,6 +88,7 @@
       - unzip
       - htop
       - tree
+      - ffmpeg
 
   #
   # Anaconda
@@ -290,6 +291,7 @@
     with_items:
       - numpy==1.11.2
       - theano==0.8.2
+      - tensorflow=0.11.0rc2
       - keras==1.0.7
       - pandas==0.19.1
       - matplotlib=1.5.3

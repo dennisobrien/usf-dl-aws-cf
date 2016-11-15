@@ -87,6 +87,7 @@ instanceType_param = t.add_parameter(
             'c3.4xlarge',
             'c3.8xlarge',
             'g2.2xlarge',
+            'p2.xlarge',
             'r3.large',
             'r3.xlarge',
             'r3.2xlarge',
@@ -159,7 +160,7 @@ ec2Instance = t.add_resource(
         Tags=Tags(
             Application=ref_stack_id,
             Network="Public",
-            Rev="0.0.0"
+            Rev="0.0.2"
         ),
     )
 )
