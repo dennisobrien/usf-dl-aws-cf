@@ -28,6 +28,7 @@
         KeyName: "{{ key_name }}"
         InstanceType: "{{ instance_type }}"
         SSHLocation: "{{ ssh_location }}"
+        HostedZone: "{{ hosted_zone }}"
     register: stack
 
   - name: show stack outputs
@@ -37,6 +38,8 @@
     add_host:
       hostname: "{{ stack.stack_outputs.PublicIP }}"
       groups: ec2_host
+      ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
 
 - name: configure ec2
   hosts: ec2_host

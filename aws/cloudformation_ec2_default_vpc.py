@@ -4,6 +4,7 @@
 
 from troposphere import (
     GetAtt,
+    Join,
     Output,
     Parameter,
     Ref,
@@ -31,6 +32,8 @@ from troposphere.ec2 import (
     VPC,
     VPCGatewayAttachment
 )
+from troposphere.route53 import RecordSetType
+
 
 t = Template()
 t.add_version('2010-09-09')
@@ -116,6 +119,14 @@ imageId_param = t.add_parameter(
     )
 )
 
+hostedZone_param = t.add_parameter(
+    Parameter(
+        'HostedZone',
+        Type='String',
+        Description='The DNS name of an existing Amazon Route 53 hosted zone'
+    )
+)
+
 
 ref_stack_id = Ref('AWS::StackId')
 ref_region = Ref('AWS::Region')
@@ -160,11 +171,22 @@ ec2Instance = t.add_resource(
         Tags=Tags(
             Application=ref_stack_id,
             Network="Public",
-            Rev="0.0.2"
+            Rev="0.0.3"
         ),
     )
 )
 
+myDNSRecord = t.add_resource(
+    RecordSetType(
+        "myDNSRecord",
+        HostedZoneName=Join("", [Ref(hostedZone_param), "."]),
+        Comment="DNS name for my instance.",
+        Name=Join("", [Ref(ec2Instance), ".", Ref("AWS::Region"), ".", Ref(hostedZone_param), "."]),
+        Type="A",
+        TTL="900",
+        ResourceRecords=[GetAtt("Ec2Instance", "PublicIp")],
+    )
+)
 
 t.add_output([
     Output(
@@ -196,6 +218,10 @@ t.add_output([
         "PrivateDNS",
         Description="Private DNSName of the newly created EC2 instance",
         Value=GetAtt(ec2Instance, "PrivateDnsName"),
+    ),
+    Output(
+        "DomainName",
+        Value=Ref(myDNSRecord)
     ),
 ])
 

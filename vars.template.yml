@@ -4,6 +4,7 @@
   key_name: aws-key
   instance_type: t2.micro
   ssh_location: 0.0.0.0/0
+  hosted_zone: abc.example.com
 
   openssl_country: US
   openssl_state: TX
