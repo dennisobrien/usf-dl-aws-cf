@@ -127,6 +127,14 @@ hostedZone_param = t.add_parameter(
     )
 )
 
+hostName_param = t.add_parameter(
+    Parameter(
+        'HostName',
+        Type='String',
+        Description='CNAME to prepend to the HostedZone'
+    )
+)
+
 
 ref_stack_id = Ref('AWS::StackId')
 ref_region = Ref('AWS::Region')
@@ -176,12 +184,12 @@ ec2Instance = t.add_resource(
     )
 )
 
-myDNSRecord = t.add_resource(
+hostRecordSet = t.add_resource(
     RecordSetType(
-        "myDNSRecord",
+        "hostRecordSet",
         HostedZoneName=Join("", [Ref(hostedZone_param), "."]),
         Comment="DNS name for my instance.",
-        Name=Join("", [Ref(ec2Instance), ".", Ref("AWS::Region"), ".", Ref(hostedZone_param), "."]),
+        Name=Join(".", [Ref(hostName_param), Ref(hostedZone_param)]),
         Type="A",
         TTL="900",
         ResourceRecords=[GetAtt("Ec2Instance", "PublicIp")],
@@ -221,7 +229,7 @@ t.add_output([
     ),
     Output(
         "DomainName",
-        Value=Ref(myDNSRecord)
+        Value=Ref(hostRecordSet)
     ),
 ])
 

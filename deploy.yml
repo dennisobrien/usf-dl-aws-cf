@@ -29,6 +29,7 @@
         InstanceType: "{{ instance_type }}"
         SSHLocation: "{{ ssh_location }}"
         HostedZone: "{{ hosted_zone }}"
+        HostName: "{{ host_name }}"
     register: stack
 
   - name: show stack outputs
