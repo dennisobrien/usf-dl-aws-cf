@@ -36,7 +36,7 @@ In addition to the software setup there are a few additional prerequisites:
 
 ## Deploying
 
-`$ ANSIBLE_HOST_KEY_CHECKING=0 ansible-playbook -vv --private-key ~/.ssh/YOUR_AWS_KEY deploy.yml --ask-vault-pass`
+`$ ansible-playbook -vv --private-key ~/.ssh/YOUR_AWS_KEY deploy.yml --ask-vault-pass`
 
 - The environment variable `ANSIBLE_HOST_KEY_CHECKING` is required since the ec2 instance is created the first time
 this playbook is run so it will not be in your known_hosts.
