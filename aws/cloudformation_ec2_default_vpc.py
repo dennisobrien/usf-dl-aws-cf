@@ -184,6 +184,14 @@ ec2Instance = t.add_resource(
     )
 )
 
+ec2EIP = t.add_resource(
+    EIP(
+        "ec2EIP",
+        InstanceId=Ref(ec2Instance),
+        Domain='vpc',
+    )
+)
+
 hostRecordSet = t.add_resource(
     RecordSetType(
         "hostRecordSet",
