@@ -53,7 +53,7 @@
     download_dir: "{{ home_dir }}/download"
     anaconda_mirror : "http://repo.continuum.io/archive"
     anaconda_python_ver : "3"
-    anaconda_ver : "4.2.0"
+    anaconda_ver : "4.3.1"
     anaconda_timeout_seconds : 600
     anaconda_platform : "{{ansible_system}}-{{ansible_machine}}"
     anaconda_name : "Anaconda{{anaconda_python_ver}}-{{anaconda_ver}}-{{anaconda_platform}}"
@@ -286,41 +286,55 @@
       executable: /bin/bash
     environment: "{{ env }}"
 
-  # TODO: find a faster way to do this, like a batch
-  - name: Install conda packages
-    shell: conda install --name py3 --channel conda-forge -y {{item}}
+  - name: copy conda environment file to server
+    copy:
+      src: envs/py3-environment.yml
+      dest: "{{ home_dir }}/py3-environment.yml"
+      owner: ubuntu
+      group: ubuntu
+      mode: 0644
+
+  - name: update conda environment from file
+    shell: "{{ anaconda_home_dir }}/envs/py3/bin/conda env update --name py3 --file {{ home_dir }}/py3-environment.yml"
     args:
       executable: /bin/bash
     environment: "{{ env }}"
-    with_items:
-      - numpy==1.11.2
-      - theano==0.8.2
-      - tensorflow=0.11.0rc2
-      - keras==1.0.7
-      - pandas==0.19.1
-      - matplotlib=1.5.3
-      - seaborn=0.7.1
-      - bokeh==0.12.3
-      - bcolz==1.0.0
-      - scikit-learn=0.18
-      - scikit-image=0.12.3
-      - statsmodels=0.6.1
-      - boto3==1.4.0
-      - ipython==5.1.0
-      - networkx=1.11
-      - requests=2.11.1
-      - scipy=0.18.1
-      - cryptography=1.5.2
-      - sh=1.11
-      - sympy=1.0
 
-  - name: Install pip packages into py3 env (not available via conda)
-    pip:
-      name: "{{ item }}"
-      executable: "{{ anaconda_home_dir }}/envs/py3/bin/pip"
-    environment: "{{ env }}"
-    with_items:
-      - kaggle-cli
+#  # TODO: find a faster way to do this, like a batch
+#  - name: Install conda packages
+#    shell: conda install --name py3 --channel conda-forge -y {{item}}
+#    args:
+#      executable: /bin/bash
+#    environment: "{{ env }}"
+#    with_items:
+#      - numpy==1.11.2
+#      - theano==0.8.2
+#      - tensorflow=0.11.0rc2
+#      - keras==1.0.7
+#      - pandas==0.19.1
+#      - matplotlib=1.5.3
+#      - seaborn=0.7.1
+#      - bokeh==0.12.3
+#      - bcolz==1.0.0
+#      - scikit-learn=0.18
+#      - scikit-image=0.12.3
+#      - statsmodels=0.6.1
+#      - boto3==1.4.0
+#      - ipython==5.1.0
+#      - networkx=1.11
+#      - requests=2.11.1
+#      - scipy=0.18.1
+#      - cryptography=1.5.2
+#      - sh=1.11
+#      - sympy=1.0
+#
+#  - name: Install pip packages into py3 env (not available via conda)
+#    pip:
+#      name: "{{ item }}"
+#      executable: "{{ anaconda_home_dir }}/envs/py3/bin/pip"
+#    environment: "{{ env }}"
+#    with_items:
+#      - kaggle-cli
 
   # FIXME: jupyter notebook is launched in the default env, but notebooks in py3 env use default conda env bin/
   # Is this a conda bug?  Or Jupyter? Or (more likely) something I've misconfigured?
@@ -336,6 +350,11 @@
     template:
       src: templates/theanorc
       dest: "{{ home_dir }}/.theanorc"
+
+  - name: Copy .keras
+    template:
+      src: templates/keras.json
+      dest: "{{ home_dir }}//.keras/keras.json"
 
   #
   # Start Jupyter Notebook

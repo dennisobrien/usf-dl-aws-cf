@@ -60,6 +60,13 @@ This does the following:
 - Deploying will restart `jupyter notebook` if there is a change to the `jupyter-notebook.service` definition.  In this
 case, if there are any currently running kernels, they will be restarted.  It would be nice to at least warn if this
 were the case.
+- Look into using EC2 spot pricing using block durations.  This gives a guaranteed block of time for the instance to
+persist before being terminated.  This seems good for many types of interactive sessions.
+    - More research needed here.  I think this would require attaching existing EBS volumes to newly created EC2 instances.
+- Look into using Terraform instead of Troposphere as an API layer on top of AWS.
+- Spawn the spot block EC2 from JupyterHub.
+    - https://github.com/jupyterhub/batchspawner
+    - https://github.com/jupyterhub/wrapspawner
 
 ## Resources
 

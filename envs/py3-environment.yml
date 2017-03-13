@@ -1,0 +1,247 @@
+name: py3
+channels:
+- conda-forge
+- defaults
+dependencies:
+- bokeh=0.12.4=py35_0
+- conda-forge::backports.shutil_get_terminal_size=1.0.0=py35_1
+- conda-forge::bcolz=1.1.2=np112py35_0
+- conda-forge::blas=1.1=openblas
+- conda-forge::bleach=1.5.0=py35_0
+- conda-forge::boto3=1.4.2=py35_0
+- conda-forge::botocore=1.4.81=py35_0
+- conda-forge::ca-certificates=2017.1.23=0
+- conda-forge::cairo=1.14.6=4
+- conda-forge::certifi=2017.1.23=py35_0
+- conda-forge::cffi=1.7.0=py35_0
+- conda-forge::click=6.7=py35_0
+- conda-forge::cloudpickle=0.2.2=py35_2
+- conda-forge::cycler=0.10.0=py35_0
+- conda-forge::dask=0.14.0=py35_0
+- conda-forge::decorator=4.0.11=py35_0
+- conda-forge::distributed=1.16.0=py35_0
+- conda-forge::docutils=0.13.1=py35_0
+- conda-forge::entrypoints=0.2.2=py35_1
+- conda-forge::fontconfig=2.12.1=4
+- conda-forge::freetype=2.7=1
+- conda-forge::gettext=0.19.7=1
+- conda-forge::glib=2.51.4=0
+- conda-forge::gmp=6.1.2=0
+- conda-forge::graphite2=1.3.9=0
+- conda-forge::h5py=2.6.0=np112py35_7
+- conda-forge::harfbuzz=1.4.3=0
+- conda-forge::hdf5=1.8.17=9
+- conda-forge::heapdict=1.0.0=py35_0
+- conda-forge::html5lib=0.999=py35_0
+- conda-forge::icu=58.1=1
+- conda-forge::idna=2.1=py35_0
+- conda-forge::ipykernel=4.5.2=py35_0
+- conda-forge::ipython=5.3.0=py35_0
+- conda-forge::ipython_genutils=0.1.0=py35_0
+- conda-forge::ipywidgets=6.0.0=py35_0
+- conda-forge::jinja2=2.9.5=py35_0
+- conda-forge::jmespath=0.9.1=py35_0
+- conda-forge::jpeg=9b=0
+- conda-forge::jsonschema=2.5.1=py35_0
+- conda-forge::jupyter=1.0.0=py35_0
+- conda-forge::jupyter_client=5.0.0=py35_0
+- conda-forge::jupyter_console=5.1.0=py35_0
+- conda-forge::jupyter_core=4.3.0=py35_0
+- conda-forge::keras=1.2.2=py35_0
+- conda-forge::libffi=3.2.1=3
+- conda-forge::libiconv=1.14=4
+- conda-forge::libpng=1.6.28=0
+- conda-forge::libsodium=1.0.10=0
+- conda-forge::libtiff=4.0.6=7
+- conda-forge::libxml2=2.9.4=4
+- conda-forge::locket=0.2.0=py35_1
+- conda-forge::markupsafe=0.23=py35_1
+- conda-forge::matplotlib=2.0.0=np112py35_2
+- conda-forge::mistune=0.7.3=py35_1
+- conda-forge::mock=2.0.0=py35_0
+- conda-forge::mpmath=0.19=py35_2
+- conda-forge::msgpack-python=0.4.8=py35_0
+- conda-forge::nbconvert=5.1.1=py35_0
+- conda-forge::nbformat=4.2.0=py35_0
+- conda-forge::ncurses=5.9=10
+- conda-forge::networkx=1.11=py35_0
+- conda-forge::notebook=4.4.1=py35_0
+- conda-forge::numexpr=2.6.2=np112py35_0
+- conda-forge::numpy=1.12.0=py35_blas_openblas_200
+- conda-forge::olefile=0.44=py35_0
+- conda-forge::openblas=0.2.19=1
+- conda-forge::openssl=1.0.2h=3
+- conda-forge::pandas=0.19.2=np112py35_1
+- conda-forge::pandoc=1.19.2=0
+- conda-forge::pandocfilters=1.4.1=py35_0
+- conda-forge::pango=1.40.4=0
+- conda-forge::partd=0.3.7=py35_0
+- conda-forge::patsy=0.4.1=py35_0
+- conda-forge::pbr=1.10.0=py35_0
+- conda-forge::pcre=8.39=0
+- conda-forge::pexpect=4.2.1=py35_0
+- conda-forge::pickleshare=0.7.3=py35_0
+- conda-forge::pillow=4.0.0=py35_2
+- conda-forge::pip=9.0.1=py35_0
+- conda-forge::pixman=0.34.0=0
+- conda-forge::prompt_toolkit=1.0.13=py35_0
+- conda-forge::protobuf=3.2.0=py35_0
+- conda-forge::psutil=5.2.0=py35_0
+- conda-forge::ptyprocess=0.5.1=py35_0
+- conda-forge::pyasn1=0.2.2=py35_0
+- conda-forge::pycparser=2.17=py35_0
+- conda-forge::pygments=2.2.0=py35_0
+- conda-forge::pyparsing=2.2.0=py35_0
+- conda-forge::pyqt=4.11.4=py35_2
+- conda-forge::pytables=3.3.0=np112py35_0
+- conda-forge::python=3.5.3=1
+- conda-forge::python-dateutil=2.6.0=py35_0
+- conda-forge::pytz=2016.10=py35_0
+- conda-forge::pyyaml=3.12=py35_0
+- conda-forge::pyzmq=16.0.2=py35_1
+- conda-forge::qt=4.8.7=7
+- conda-forge::qtconsole=4.2.1=py35_1
+- conda-forge::readline=6.2=0
+- conda-forge::requests=2.13.0=py35_0
+- conda-forge::s3fs=0.0.9=py35_0
+- conda-forge::s3transfer=0.1.9=py35_0
+- conda-forge::scikit-image=0.12.3=np112py35_1
+- conda-forge::scikit-learn=0.18=np112py35_blas_openblas_204
+- conda-forge::scipy=0.19.0=np112py35_blas_openblas_200
+- conda-forge::seaborn=0.7.1=py35_0
+- conda-forge::setuptools=33.1.0=py35_0
+- conda-forge::sh=1.11=py35_0
+- conda-forge::simplegeneric=0.8.1=py35_0
+- conda-forge::sip=4.18=py35_1
+- conda-forge::six=1.10.0=py35_1
+- conda-forge::sortedcontainers=1.5.3=py35_0
+- conda-forge::sqlite=3.13.0=1
+- conda-forge::statsmodels=0.8.0=np112py35_0
+- conda-forge::sympy=1.0=py35_0
+- conda-forge::terminado=0.6=py35_0
+- conda-forge::testpath=0.3=py35_0
+- conda-forge::theano=0.8.2=py35_0
+- conda-forge::tk=8.5.19=1
+- conda-forge::toolz=0.8.2=py35_0
+- conda-forge::tornado=4.4.2=py35_0
+- conda-forge::traitlets=4.3.1=py35_0
+- conda-forge::wcwidth=0.1.7=py35_0
+- conda-forge::webencodings=0.5=py35_0
+- conda-forge::wheel=0.29.0=py35_0
+- conda-forge::widgetsnbextension=2.0.0=py35_0
+- conda-forge::xz=5.2.2=0
+- conda-forge::yaml=0.1.6=0
+- conda-forge::zeromq=4.2.1=1
+- conda-forge::zict=0.1.1=py35_0
+- conda-forge::zlib=1.2.11=0
+- cryptography=1.7.1=py35_0
+- fastcache=1.0.2=py35_1
+- libgfortran=3.0.0=1
+- mkl=2017.0.1=0
+- tblib=1.3.0=py35_0
+- pip:
+  - backports.shutil-get-terminal-size==1.0.0
+  - bcolz==1.1.2
+  - beautifulsoup4==4.5.1
+  - bleach==1.5.0
+  - boto3==1.4.2
+  - botocore==1.4.81
+  - certifi==2017.1.23
+  - cffi==1.7.0
+  - click==6.7
+  - cliff==2.2.0
+  - cloudpickle==0.2.2
+  - cmd2==0.6.9
+  - configparser==3.5.0
+  - cssselect==1.0.0
+  - cycler==0.10.0
+  - dask==0.14.0
+  - decorator==4.0.11
+  - distributed==1.16.0
+  - docutils==0.13.1
+  - entrypoints==0.2.2
+  - h5py==2.6.0
+  - heapdict==1.0.0
+  - html5lib==0.999
+  - idna==2.1
+  - ipykernel==4.5.2
+  - ipython==5.3.0
+  - ipython-genutils==0.1.0
+  - ipywidgets==6.0.0
+  - jinja2==2.9.5
+  - jmespath==0.9.1
+  - jsonschema==2.5.1
+  - jupyter-client==5.0.0
+  - jupyter-console==5.1.0
+  - jupyter-core==4.3.0
+  - kaggle-cli==0.4.3
+  - keras==1.2.2
+  - locket==0.2.0
+  - lxml==3.6.4
+  - markupsafe==0.23
+  - matplotlib==2.0.0
+  - mechanicalsoup==0.6.0
+  - mistune==0.7.3
+  - mock==2.0.0
+  - mpmath==0.19
+  - msgpack-python==0.4.8
+  - nbconvert==5.1.1
+  - nbformat==4.2.0
+  - networkx==1.11
+  - notebook==4.4.1
+  - numexpr==2.6.2
+  - numpy==1.12.0
+  - olefile==0.44
+  - pandas==0.19.2
+  - pandocfilters==1.4.1
+  - partd==0.3.7
+  - patsy==0.4.1
+  - pbr==1.10.0
+  - pexpect==4.2.1
+  - pickleshare==0.7.3
+  - pillow==4.4.0
+  - pip==9.0.1
+  - prettytable==0.7.2
+  - prompt-toolkit==1.0.13
+  - protobuf==3.2.0
+  - psutil==5.2.0
+  - ptyprocess==0.5.1
+  - pyasn1==0.2.2
+  - pycparser==2.17
+  - pygments==2.2.0
+  - pyparsing==2.2.0
+  - python-dateutil==2.6.0
+  - pytz==2016.10
+  - pyyaml==3.12
+  - pyzmq==16.0.2
+  - qtconsole==4.2.1
+  - requests==2.13.0
+  - s3fs==0.0.9
+  - s3transfer==0.1.9
+  - scikit-image==0.12.3
+  - scikit-learn==0.18
+  - scipy==0.19.0
+  - seaborn==0.7.1
+  - setuptools==33.1.0.post20170122
+  - sh==1.11
+  - simplegeneric==0.8.1
+  - six==1.10.0
+  - sortedcontainers==1.5.3
+  - statsmodels==0.8.0
+  - stevedore==1.18.0
+  - sympy==1.0
+  - tables==3.3.0
+  - tensorflow-gpu==1.0.1
+  - terminado==0.6
+  - testpath==0.3
+  - theano==0.8.2
+  - toolz==0.8.2
+  - tornado==4.4.2
+  - traitlets==4.3.1
+  - wcwidth==0.1.7
+  - webencodings==0.5
+  - wheel==0.29.0
+  - widgetsnbextension==2.0.0
+  - zict==0.1.1
+prefix: /home/ubuntu/anaconda3/envs/py3
+
