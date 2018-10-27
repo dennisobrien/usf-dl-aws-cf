@@ -1,5 +1,11 @@
 # usf-dl-aws-cf
 
+**Note**: This is no longer actively developed.  It was a proof of concept to provision an
+AWS EC2 with libraries used for the fast.ai course as USF in 2016.  There are currently 
+better ways to get a machine up and running.  If I revisit the AWS option, I will update
+this repo.
+
+
 Scripts and tools for spinning up deep learning stacks using AWS CloudFormation.  Experimental.
 
 Based on shell scripts provided by Jeremy Howard in the Deep Learning I course at USF.
